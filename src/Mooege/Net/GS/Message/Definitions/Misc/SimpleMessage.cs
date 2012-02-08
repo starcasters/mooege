@@ -42,7 +42,6 @@ namespace Mooege.Net.GS.Message.Definitions.Misc
 
         public override void Encode(GameBitBuffer buffer)
         {
-            throw new NotImplementedException();
         }
 
         public override void AsText(StringBuilder b, int pad)
