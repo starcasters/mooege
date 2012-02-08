@@ -88,6 +88,9 @@ namespace GameMessageViewer
         /// </summary>
         public bool IsGSStream(string stream)
         {
+            if (stream == "")
+                return false;
+
             var x = stream.Substring(0, stream.IndexOf("\n"));
             
             if ((x.Substring(0,1) != "O") && (x.Substring(0,1) != "I"))
@@ -382,7 +385,7 @@ namespace GameMessageViewer
             if(removeChars < 0)
                 removeChars = rows[0].IndexOf("Out:");
             string clientHash = "";
-            int counter = 0;
+            int lastpacket = 0;
             int size = 0;
             Dictionary<string, BufferNode> lastNodesMissingData = new Dictionary<string, BufferNode>();
             for (int i = 0; i < rows.Length; i++)
@@ -407,54 +410,52 @@ namespace GameMessageViewer
                         // Everytime the direction of data changes, the buffer is parsed and emptied
                         // this is for pcap dumps where the data stream is sent in smaller packets
                         // in mooege, data is dumped in whole
-                        if (i > 0 && rows[i].Substring(0, 1) != currentDirection)
-                        {
-                            byte[] buf = new byte[size / 2];
-                            size = 0;
-                            for(int k = i - counter; k < i; k++)
+                        if (i > 0)
+                            if (rows[i].Substring(0, 1) != currentDirection)
                             {
-                                Array.Copy(String_To_Bytes(rows[k]), 0, buf, size / 2, rows[k].Length / 2); 
-                                size += rows[k].Length;
-                            }
+                                byte[] buf = new byte[size / 2];
+                                size = 0;
+                                for (int k = lastpacket; k < i; k++)
+                                {
+                                    Array.Copy(String_To_Bytes(rows[k]), 0, buf, size / 2, rows[k].Length / 2);
+                                    size += rows[k].Length;
+                                }
 
-                            if (lastNodesMissingData[clientHash + currentDirection] == null)
-                            {
-                                BufferNode newNode = new BufferNode(actors, quests, clientHash);
+                                if (lastNodesMissingData[clientHash + currentDirection] == null)
+                                {
+                                    BufferNode newNode = new BufferNode(actors, quests, clientHash);
 
-                                if (newNode.Append(buf))
-                                    lastNodesMissingData[clientHash + currentDirection] = newNode;
+                                    if (newNode.Append(buf))
+                                        lastNodesMissingData[clientHash + currentDirection] = newNode;
+                                    else
+                                        lastNodesMissingData[clientHash + currentDirection] = null;
+
+                                    newNode.BackColor = currentDirection == "I" ? colors[clientHash][0] : colors[clientHash][1];
+                                    allNodes.Add(newNode);
+                                }
                                 else
-                                    lastNodesMissingData[clientHash + currentDirection] = null;
-
-                                newNode.BackColor = currentDirection == "I" ? colors[clientHash][0] : colors[clientHash][1];
-                                allNodes.Add(newNode);
+                                {
+                                    if (false == lastNodesMissingData[clientHash + currentDirection].Append(buf))
+                                        lastNodesMissingData[clientHash + currentDirection] = null;
+                                }
+                                lastpacket = i;
+                                size = 0;
+                                currentDirection = rows[i].Substring(0, 1);
                             }
-                            else
-                            {
-                                if (false == lastNodesMissingData[clientHash + currentDirection].Append(buf))
-                                    lastNodesMissingData[clientHash + currentDirection] = null;
-                            }
-
-
-                            counter = 0;
-                            size = 0;
-                            currentDirection = rows[i].Substring(0, 1);
-                        }
 
                         if (currentDirection == "") currentDirection = rows[i].Substring(0, 1);
                         rows[i] = rows[i].Substring(13).Replace("\r", "");
-                        counter++;
                         size += rows[i].Length;
                     }
                 }
             }
 
 
-            if (counter > 0)
+            if (lastpacket < rows.Length)
             {
                 byte[] buf = new byte[size / 2];
                 size = 0;
-                for (int k = rows.Length - counter; k < rows.Length; k++)
+                for (int k = lastpacket; k < rows.Length; k++)
                 {
                     Array.Copy(String_To_Bytes(rows[k]), 0, buf, size / 2, rows[k].Length / 2);
                     size += rows[k].Length;
