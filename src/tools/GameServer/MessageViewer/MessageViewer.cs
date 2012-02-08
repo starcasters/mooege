@@ -203,6 +203,8 @@ namespace GameMessageViewer
             output.Rtf = temp.Rtf;
             foreach (TreeNode tn in actors.Nodes)
             {
+                if (tn.Tag == null)
+                    continue;
                 int pos = temp.Find(tn.Tag as string);
 
                 if (pos > -1)

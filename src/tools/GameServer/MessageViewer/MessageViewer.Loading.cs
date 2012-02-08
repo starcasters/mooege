@@ -204,7 +204,8 @@ namespace GameMessageViewer
                         {
                             if (DialogResult.Yes == MessageBox.Show("The dump contains more than one unidentified stream, but in none of them mooege version {0} was found. The dump is either broken or of a version Mooege does not support. Continue loading all streams? (This may take longer and messages may appear broken)", "Multiple streams found", MessageBoxButtons.YesNo, MessageBoxIcon.Question))
                                 foreach (var stream in gsStreams)
-                                    LoadDump(stream);
+                                    if (IsGSStream(stream))
+                                        LoadDump(stream);
                         }
                     }
                 }
@@ -446,6 +447,11 @@ namespace GameMessageViewer
                         if (currentDirection == "") currentDirection = rows[i].Substring(0, 1);
                         rows[i] = rows[i].Substring(13).Replace("\r", "");
                         size += rows[i].Length;
+                    }
+                    else
+                    {
+                        //clean invalid lines.
+                        rows[i] = "";
                     }
                 }
             }
