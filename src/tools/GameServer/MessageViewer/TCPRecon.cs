@@ -175,7 +175,18 @@ namespace GameMessageViewer
                         src_addr[j] = srcx;
                         src_port[j] = srcport;
                         src_index = j;
-                        first = true;
+                        seq[j] = sequence;
+
+                        //eigther syn or syn+ack make for first packets
+                        if (synflag)
+                        {
+                            first = true;
+                        }
+                        else
+                        {
+                            incomplete_tcp_stream = true;
+                        }
+
                         break;
                     }
                 }
@@ -185,25 +196,17 @@ namespace GameMessageViewer
                 throw new Exception("ERROR in reassemble_tcp: Too many addresses!");
             }
 
-            if (data_length < length)
-            {
-                incomplete_tcp_stream = true;
-            }
-
             /* now that we have filed away the srcs, lets get the sequence number stuff
              figured out */
             if (first)
             {
                 /* this is the first time we have seen this src's sequence number */
-                seq[src_index] = sequence + length;
-                if (synflag)
-                {
-                    seq[src_index]++;
-                }
+                seq[src_index] += length;
                 /* write out the packet data */
                 write_packet_data(src_index, data);
                 return;
             }
+
             /* if we are here, we have already seen this src, let's
             try and figure out if this packet is in the right place */
             if (sequence < seq[src_index])
@@ -246,7 +249,7 @@ namespace GameMessageViewer
             {
                 /* right on time */
                 seq[src_index] += length;
-                if (synflag) seq[src_index]++;
+                //if (synflag) seq[src_index]++;
                 if (data != null)
                 {
                     write_packet_data(src_index, data);

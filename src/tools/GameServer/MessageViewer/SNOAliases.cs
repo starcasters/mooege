@@ -30,6 +30,9 @@ namespace GameMessageViewer
     {
         public static string GetAlias(int sno)
         {
+            if (MPQStorage.Data == null)
+                return "mpqs not loaded";
+
             foreach (var group in MPQStorage.Data.Assets.Values)
                 if (group.ContainsKey(sno))
                     return Path.GetFileName(group[sno].FileName);

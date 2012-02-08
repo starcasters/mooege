@@ -31,6 +31,8 @@ using Mooege.Net.MooNet.Packets;
 using Mooege.Core.MooNet.Services;
 using Mooege.Net.MooNet;
 using Mooege.Net.MooNet.RPC;
+using Mooege.Net.GS.Message;
+using Mooege.Net.GS.Message.Definitions.Game;
 
 namespace GameMessageViewer
 {
@@ -84,16 +86,35 @@ namespace GameMessageViewer
         /// Returns the protocol version for a given stream if the information is available
         /// Only GS streams have that version set (i guess/hope)
         /// </summary>
-        public string GetVersion(string stream)
+        public bool IsGSStream(string stream)
         {
-            string[] versions = new string[] { "0.5.1.8101", "0.4.0.7865", "0.3.1.7779", "0.3.0.7484", "0.3.0.7333" };
+            var x = stream.Substring(0, stream.IndexOf("\n"));
+            
+            if ((x.Substring(0,1) != "O") && (x.Substring(0,1) != "I"))
+                return "";
 
+            var currentBuffer = (x.Substring(13)).Replace("\r", "");
+            var buf = String_To_Bytes(currentBuffer);
 
-            foreach (string version in versions)
-                if(stream.Contains(Encode(version)))
-                    return version;
+            GameBitBuffer bitbuffer = new GameBitBuffer(buf);
+            
+            if (bitbuffer.IsPacketAvailable())
+            {
+                try
+                {
+                    bitbuffer.Position = 32;
+                    GameMessage message = bitbuffer.ParseMessage();
+                    if (message is JoinBNetGameMessage)
+                    {
+                        return true;
+                    }
+                }
+                catch (Exception e)
+                {
 
-            return "unknown";
+                }
+            }
+            return false;
         }
 
 
@@ -158,6 +179,7 @@ namespace GameMessageViewer
                     // if (IsMooNetStream(text)) LoadMooNetDump(text);
                     if (IsAchievmentStream(text)) System.Console.WriteLine("Achievementstream not parsed");
 
+                    //add unknow streams to check em
                     if (!IsMooNetStream(text) && !IsAchievmentStream(text))
                         gsStreams.Add(text);
                 }
@@ -166,7 +188,7 @@ namespace GameMessageViewer
                 // if only one stream is found, or more are found but only one is tagged with mooege protocol version load that one
                 if (gsStreams.Count > 0)
                 {
-                    var correct = gsStreams.Where(x => GetVersion(x).Equals(Mooege.Common.Versions.VersionInfo.Ingame.VersionString));
+                    var correct = gsStreams.Where(x => IsGSStream(x).Equals(true));
 
                     if (correct.Count() == 1)
                         LoadDump(correct.First());
