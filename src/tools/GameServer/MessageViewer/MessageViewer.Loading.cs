@@ -91,7 +91,7 @@ namespace GameMessageViewer
             var x = stream.Substring(0, stream.IndexOf("\n"));
             
             if ((x.Substring(0,1) != "O") && (x.Substring(0,1) != "I"))
-                return "";
+                return false; //is this a mooege dump?
 
             var currentBuffer = (x.Substring(13)).Replace("\r", "");
             var buf = String_To_Bytes(currentBuffer);
@@ -106,6 +106,7 @@ namespace GameMessageViewer
                     GameMessage message = bitbuffer.ParseMessage();
                     if (message is JoinBNetGameMessage)
                     {
+                        //this isnt real confirmation :P
                         return true;
                     }
                 }
