@@ -200,6 +200,8 @@ namespace GameMessageViewer
              figured out */
             if (first)
             {
+                //assuming first = syn, seq ++
+                seq[src_index] += 1;
                 /* this is the first time we have seen this src's sequence number */
                 seq[src_index] += length;
                 /* write out the packet data */
