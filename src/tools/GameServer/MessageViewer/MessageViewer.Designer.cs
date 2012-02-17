@@ -48,6 +48,8 @@
             this.tabControl2 = new System.Windows.Forms.TabControl();
             this.tabPage1 = new System.Windows.Forms.TabPage();
             this.tree = new System.Windows.Forms.TreeView();
+            this.MooNet = new System.Windows.Forms.TabPage();
+            this.MooNetTree = new System.Windows.Forms.TreeView();
             this.panel_messages_header = new System.Windows.Forms.Panel();
             this.panel1 = new System.Windows.Forms.Panel();
             this.progressBar = new System.Windows.Forms.ProgressBar();
@@ -65,8 +67,8 @@
             this.trySNOAliasesToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.aboutToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.aboutToolStripMenuItem1 = new System.Windows.Forms.ToolStripMenuItem();
-            this.MooNet = new System.Windows.Forms.TabPage();
-            this.MooNetTree = new System.Windows.Forms.TreeView();
+            this.expandAllItemsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.toolStripMenuItem3 = new System.Windows.Forms.ToolStripSeparator();
             this.panel_mainframe.SuspendLayout();
             this.tabControl1.SuspendLayout();
             this.tabActors.SuspendLayout();
@@ -79,9 +81,9 @@
             this.panel_messages_content.SuspendLayout();
             this.tabControl2.SuspendLayout();
             this.tabPage1.SuspendLayout();
+            this.MooNet.SuspendLayout();
             this.panel1.SuspendLayout();
             this.menuStrip1.SuspendLayout();
-            this.MooNet.SuspendLayout();
             this.SuspendLayout();
             // 
             // panel_mainframe
@@ -288,6 +290,25 @@
             this.tree.TabIndex = 6;
             this.tree.AfterSelect += new System.Windows.Forms.TreeViewEventHandler(this.tree_AfterSelect);
             // 
+            // MooNet
+            // 
+            this.MooNet.Controls.Add(this.MooNetTree);
+            this.MooNet.Location = new System.Drawing.Point(4, 22);
+            this.MooNet.Name = "MooNet";
+            this.MooNet.Size = new System.Drawing.Size(249, 372);
+            this.MooNet.TabIndex = 1;
+            this.MooNet.Text = "MooNet";
+            this.MooNet.UseVisualStyleBackColor = true;
+            // 
+            // MooNetTree
+            // 
+            this.MooNetTree.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.MooNetTree.Location = new System.Drawing.Point(0, 0);
+            this.MooNetTree.Name = "MooNetTree";
+            this.MooNetTree.Size = new System.Drawing.Size(249, 372);
+            this.MooNetTree.TabIndex = 0;
+            this.MooNetTree.AfterSelect += new System.Windows.Forms.TreeViewEventHandler(this.tree_AfterSelect);
+            // 
             // panel_messages_header
             // 
             this.panel_messages_header.AutoSize = true;
@@ -335,32 +356,34 @@
             this.toolStripMenuItem2,
             this.exitToolStripMenuItem});
             this.fileToolStripMenuItem.Name = "fileToolStripMenuItem";
-            this.fileToolStripMenuItem.Size = new System.Drawing.Size(37, 20);
+            this.fileToolStripMenuItem.Size = new System.Drawing.Size(40, 20);
             this.fileToolStripMenuItem.Text = "File";
             // 
             // openPreparsedDumpToolStripMenuItem
             // 
             this.openPreparsedDumpToolStripMenuItem.Name = "openPreparsedDumpToolStripMenuItem";
-            this.openPreparsedDumpToolStripMenuItem.Size = new System.Drawing.Size(134, 22);
+            this.openPreparsedDumpToolStripMenuItem.Size = new System.Drawing.Size(154, 22);
             this.openPreparsedDumpToolStripMenuItem.Text = "Open...";
             this.openPreparsedDumpToolStripMenuItem.Click += new System.EventHandler(this.openPreparsedDumpToolStripMenuItem_Click);
             // 
             // toolStripMenuItem2
             // 
             this.toolStripMenuItem2.Name = "toolStripMenuItem2";
-            this.toolStripMenuItem2.Size = new System.Drawing.Size(131, 6);
+            this.toolStripMenuItem2.Size = new System.Drawing.Size(151, 6);
             // 
             // exitToolStripMenuItem
             // 
             this.exitToolStripMenuItem.Name = "exitToolStripMenuItem";
             this.exitToolStripMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Alt | System.Windows.Forms.Keys.F4)));
-            this.exitToolStripMenuItem.Size = new System.Drawing.Size(134, 22);
+            this.exitToolStripMenuItem.Size = new System.Drawing.Size(154, 22);
             this.exitToolStripMenuItem.Text = "Exit";
             this.exitToolStripMenuItem.Click += new System.EventHandler(this.exitToolStripMenuItem_Click);
             // 
             // optionsToolStripMenuItem
             // 
             this.optionsToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.expandAllItemsToolStripMenuItem,
+            this.toolStripMenuItem3,
             this.messageFilterToolStripMenuItem,
             this.filterPlayersToolStripMenuItem,
             this.findAllMessagesToolStripMenuItem,
@@ -368,26 +391,26 @@
             this.toolStripMenuItem1,
             this.trySNOAliasesToolStripMenuItem});
             this.optionsToolStripMenuItem.Name = "optionsToolStripMenuItem";
-            this.optionsToolStripMenuItem.Size = new System.Drawing.Size(61, 20);
+            this.optionsToolStripMenuItem.Size = new System.Drawing.Size(63, 20);
             this.optionsToolStripMenuItem.Text = "Options";
             // 
             // messageFilterToolStripMenuItem
             // 
             this.messageFilterToolStripMenuItem.Name = "messageFilterToolStripMenuItem";
-            this.messageFilterToolStripMenuItem.Size = new System.Drawing.Size(175, 22);
+            this.messageFilterToolStripMenuItem.Size = new System.Drawing.Size(203, 22);
             this.messageFilterToolStripMenuItem.Text = "Filter messages...";
             this.messageFilterToolStripMenuItem.Click += new System.EventHandler(this.messageFilterToolStripMenuItem_Click);
             // 
             // filterPlayersToolStripMenuItem
             // 
             this.filterPlayersToolStripMenuItem.Name = "filterPlayersToolStripMenuItem";
-            this.filterPlayersToolStripMenuItem.Size = new System.Drawing.Size(175, 22);
+            this.filterPlayersToolStripMenuItem.Size = new System.Drawing.Size(203, 22);
             this.filterPlayersToolStripMenuItem.Text = "Filter players";
             // 
             // findAllMessagesToolStripMenuItem
             // 
             this.findAllMessagesToolStripMenuItem.Name = "findAllMessagesToolStripMenuItem";
-            this.findAllMessagesToolStripMenuItem.Size = new System.Drawing.Size(175, 22);
+            this.findAllMessagesToolStripMenuItem.Size = new System.Drawing.Size(203, 22);
             this.findAllMessagesToolStripMenuItem.Text = "Find all messages...";
             this.findAllMessagesToolStripMenuItem.Click += new System.EventHandler(this.findAllMessagesToolStripMenuItem_Click);
             // 
@@ -395,14 +418,14 @@
             // 
             this.queryToolStripMenuItem.Name = "queryToolStripMenuItem";
             this.queryToolStripMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.Q)));
-            this.queryToolStripMenuItem.Size = new System.Drawing.Size(175, 22);
+            this.queryToolStripMenuItem.Size = new System.Drawing.Size(203, 22);
             this.queryToolStripMenuItem.Text = "Query...";
             this.queryToolStripMenuItem.Click += new System.EventHandler(this.queryToolStripMenuItem_Click);
             // 
             // toolStripMenuItem1
             // 
             this.toolStripMenuItem1.Name = "toolStripMenuItem1";
-            this.toolStripMenuItem1.Size = new System.Drawing.Size(172, 6);
+            this.toolStripMenuItem1.Size = new System.Drawing.Size(200, 6);
             // 
             // trySNOAliasesToolStripMenuItem
             // 
@@ -410,7 +433,7 @@
             this.trySNOAliasesToolStripMenuItem.CheckOnClick = true;
             this.trySNOAliasesToolStripMenuItem.CheckState = System.Windows.Forms.CheckState.Checked;
             this.trySNOAliasesToolStripMenuItem.Name = "trySNOAliasesToolStripMenuItem";
-            this.trySNOAliasesToolStripMenuItem.Size = new System.Drawing.Size(175, 22);
+            this.trySNOAliasesToolStripMenuItem.Size = new System.Drawing.Size(203, 22);
             this.trySNOAliasesToolStripMenuItem.Text = "Try SNO Aliases";
             // 
             // aboutToolStripMenuItem
@@ -418,34 +441,27 @@
             this.aboutToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.aboutToolStripMenuItem1});
             this.aboutToolStripMenuItem.Name = "aboutToolStripMenuItem";
-            this.aboutToolStripMenuItem.Size = new System.Drawing.Size(52, 20);
+            this.aboutToolStripMenuItem.Size = new System.Drawing.Size(53, 20);
             this.aboutToolStripMenuItem.Text = "About";
             // 
             // aboutToolStripMenuItem1
             // 
             this.aboutToolStripMenuItem1.Name = "aboutToolStripMenuItem1";
-            this.aboutToolStripMenuItem1.Size = new System.Drawing.Size(116, 22);
+            this.aboutToolStripMenuItem1.Size = new System.Drawing.Size(152, 22);
             this.aboutToolStripMenuItem1.Text = "About...";
             this.aboutToolStripMenuItem1.Click += new System.EventHandler(this.aboutToolStripMenuItem1_Click);
             // 
-            // MooNet
+            // expandAllItemsToolStripMenuItem
             // 
-            this.MooNet.Controls.Add(this.MooNetTree);
-            this.MooNet.Location = new System.Drawing.Point(4, 22);
-            this.MooNet.Name = "MooNet";
-            this.MooNet.Size = new System.Drawing.Size(249, 372);
-            this.MooNet.TabIndex = 1;
-            this.MooNet.Text = "MooNet";
-            this.MooNet.UseVisualStyleBackColor = true;
+            this.expandAllItemsToolStripMenuItem.Name = "expandAllItemsToolStripMenuItem";
+            this.expandAllItemsToolStripMenuItem.Size = new System.Drawing.Size(203, 22);
+            this.expandAllItemsToolStripMenuItem.Text = "Expand all items";
+            this.expandAllItemsToolStripMenuItem.Click += new System.EventHandler(this.expandAllItemsToolStripMenuItem_Click);
             // 
-            // MooNetTree
+            // toolStripMenuItem3
             // 
-            this.MooNetTree.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.MooNetTree.Location = new System.Drawing.Point(0, 0);
-            this.MooNetTree.Name = "MooNetTree";
-            this.MooNetTree.Size = new System.Drawing.Size(249, 372);
-            this.MooNetTree.TabIndex = 0;
-            this.MooNetTree.AfterSelect += new System.Windows.Forms.TreeViewEventHandler(this.tree_AfterSelect);
+            this.toolStripMenuItem3.Name = "toolStripMenuItem3";
+            this.toolStripMenuItem3.Size = new System.Drawing.Size(200, 6);
             // 
             // MessageViewer
             // 
@@ -474,10 +490,10 @@
             this.panel_messages_content.ResumeLayout(false);
             this.tabControl2.ResumeLayout(false);
             this.tabPage1.ResumeLayout(false);
+            this.MooNet.ResumeLayout(false);
             this.panel1.ResumeLayout(false);
             this.menuStrip1.ResumeLayout(false);
             this.menuStrip1.PerformLayout();
-            this.MooNet.ResumeLayout(false);
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -523,6 +539,8 @@
         private System.Windows.Forms.TreeView tree;
         private System.Windows.Forms.TabPage MooNet;
         private System.Windows.Forms.TreeView MooNetTree;
+        private System.Windows.Forms.ToolStripMenuItem expandAllItemsToolStripMenuItem;
+        private System.Windows.Forms.ToolStripSeparator toolStripMenuItem3;
 
 
     }

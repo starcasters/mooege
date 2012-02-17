@@ -351,5 +351,10 @@ namespace GameMessageViewer
                 tabControl2.TabPages.Remove((TabPage)tabControl2.SelectedTab);
         }
 
+        private void expandAllItemsToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            tree.ExpandAll();
+        }
+
     }
 }
