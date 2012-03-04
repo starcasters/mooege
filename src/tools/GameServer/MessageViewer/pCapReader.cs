@@ -148,12 +148,29 @@ namespace GameMessageViewer
         // The callback function for the SharpPcap library
         private static void device_PcapOnPacketArrival(object sender, CaptureEventArgs e)
         {
-            if (Packet.ParsePacket(LinkLayers.Ethernet, e.Packet.Data).PayloadPacket == null) return;
+            var packet = Packet.ParsePacket(LinkLayers.Ethernet, e.Packet.Data);
+            var eth_packet = packet as EthernetPacket;
 
-            TcpPacket tcpPacket = Packet.ParsePacket(LinkLayers.Ethernet, e.Packet.Data).PayloadPacket.PayloadPacket as TcpPacket;
+            if (packet.PayloadPacket == null) return;
+
+            //drop non ipv4
+            if (eth_packet.Type != EthernetPacketType.IpV4)
+                return;
+
+            IPv4Packet ipv4Packet = eth_packet.PayloadPacket as IPv4Packet;
+            if (ipv4Packet.PayloadPacket == null) return;
+            
+
+            TcpPacket tcpPacket = ipv4Packet.PayloadPacket as TcpPacket;
+
+            if (tcpPacket == null)
+                return;
+
+            if (!tcpPacket.ValidChecksum)
+                return;
 
             // THIS FILTERS D3 TRAFFIC, GS AS WELL AS MOONET
-            if (tcpPacket != null && (tcpPacket.SourcePort == 1119 || tcpPacket.DestinationPort == 1119))
+            if (tcpPacket.SourcePort == 1119 || tcpPacket.DestinationPort == 1119)
             {
                 Connection c = new Connection(tcpPacket);
                 if (!sharpPcapDict.ContainsKey(c))
