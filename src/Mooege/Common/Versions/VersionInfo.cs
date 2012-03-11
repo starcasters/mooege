@@ -123,10 +123,12 @@ namespace Mooege.Common.Versions
             // unchecked((int)0x9E121BBD)   // 7728
             // 0x21EEE08D                   // 7446
 
+            public const string MajorVersion = "0.8.0";
             //This is the server version sent in VersionsMessage
-            public const string VersionString = "0.7.0.8619";
+            public const string VersionString = "0.8.0.8815";
 
             // old version strings.
+            // 0.8.0.8815 // 8815 patch 14
             // 0.7.0.8619 // 8610 patch 13
             // 0.6.2.8392 // 8392 patch 12
             // 0.6.1.8350 // 8350 patch 11

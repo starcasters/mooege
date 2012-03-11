@@ -329,6 +329,8 @@ namespace Mooege.Net.MooNet
 
             //if (this.TLSStream.RemoteCertificate != null) // throws exception too, should be fixed /raist.
             // Logger.Warn("Remote certificate was issued to {0} by {1} and is valid from {2} until {3}.", this.TLSStream.RemoteCertificate.Subject, this.TLSStream.RemoteCertificate.Issuer, this.TLSStream.RemoteCertificate.NotBefore, this.TLSStream.RemoteCertificate.NotAfter);
+
+            Mooege.Core.MooNet.Authentication.AuthManager.SendAccountSettings(this);
         }
 
         #endregion
