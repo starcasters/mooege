@@ -41,9 +41,7 @@
     <Compile Include="bnet\protocol\authentication\AuthenticationService.cs" />
     <Compile Include="bnet\protocol\challenge\ChallengeService.cs" />
     <Compile Include="bnet\protocol\channel\ChannelService.cs" />
-    <Compile Include="bnet\protocol\channel_invitation\ChannelInvitationService.cs">
-      <SubType>Code</SubType>
-    </Compile>
+    <Compile Include="bnet\protocol\channel_invitation\ChannelInvitation.cs" />
     <Compile Include="bnet\protocol\config\Locale.cs" />
     <Compile Include="bnet\protocol\config\RpcConfig.cs" />
     <Compile Include="bnet\protocol\connection\ConnectionService.cs" />
