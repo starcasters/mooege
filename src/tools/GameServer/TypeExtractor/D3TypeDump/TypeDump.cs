@@ -172,6 +172,7 @@ namespace D3TypeDump
                     gmi.Size = size;
                     _gameMessageLookUp.Add(offTypeDescriptor, gmi);
                 }
+                
                 gmi.Opcodes.Add(opcode);
             }
 

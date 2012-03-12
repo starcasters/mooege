@@ -33,6 +33,7 @@ namespace D3TypeDescriptor
         public int Index;
         public string Name;
         public int UnkValue;
+        public string NetworkIds;
 
         public virtual bool IsBasicType { get { return false; } }
         public virtual bool IsStructure { get { return false; } }
@@ -156,6 +157,7 @@ namespace D3TypeDescriptor
             Index = e.IntAttribute("Index");
             Name = e.Attribute("Name").Value;
             UnkValue = e.OptionalIntAttribute("UnkValue");
+            NetworkIds = e.OptionalStringAttribute("NetworkIds");
         }
         public virtual void LoadFields(FieldDescriptor[] fields) { throw new Exception("This type doesnt handle fields."); }
 

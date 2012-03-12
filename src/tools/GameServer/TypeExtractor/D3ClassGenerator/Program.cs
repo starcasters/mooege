@@ -16,11 +16,13 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 
- using System;
- using System.IO;
- using System.Text;
+using System;
+using System.IO;
+using System.Text;
 using D3TypeDescriptor;
 using System.Xml.Linq;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace D3ClassGenerator
 {
@@ -45,6 +47,31 @@ namespace D3ClassGenerator
                 writer.WriteLine(b.ToString());
             }
 
+            writer.Close();
+
+            writer = new StreamWriter("opcodes.cs");
+      
+            Dictionary<int, TypeDescriptor> ids = new Dictionary<int,TypeDescriptor>();
+            foreach (var s in structs)
+            {
+                if (s.NetworkIds != "")
+                {
+                    foreach (var id in s.NetworkIds.Split(' '))
+                    {
+                        ids[Convert.ToInt32(id)] = s;
+                    }
+                }
+            }
+
+            var sorted_ids = from k in ids
+                        orderby k.Key ascending
+                        select k;
+
+            foreach (var a in sorted_ids)
+            {
+                writer.WriteLine(a.Value.Name + " = " + a.Key.ToString());
+            }
+            
             writer.Close();
 
             writer = new StreamWriter("attributes-output.cs");
