@@ -51,6 +51,7 @@ namespace GameMessageViewer
         tcp_frag[] frags = new tcp_frag[2];
         // holds the last sequence number for each direction
         ulong[] seq = new ulong[2];
+        bool[] seqinit = new bool[2];
         long[] src_addr = new long[2];
         uint[] src_port = new uint[2];
         bool empty_tcp_stream = true;
@@ -99,11 +100,6 @@ namespace GameMessageViewer
         /// <param name="tcpPacket"></param>
         public void ReassemblePacket(PacketDotNet.TcpPacket tcpPacket)
         {
-            // if the paylod length is zero bail out
-            //ulong length = (ulong)(tcpPacket.Bytes.Length - tcpPacket.TCPHeaderLength);
-            //if (length == 0) return;
-            if (tcpPacket.PayloadData == null || tcpPacket.PayloadData.Length == 0) return;
-
             reassemble_tcp((ulong)tcpPacket.SequenceNumber, (ulong)tcpPacket.PayloadData.Length,
                             tcpPacket.PayloadData, (ulong)tcpPacket.PayloadData.Length, tcpPacket.Syn,
                             (tcpPacket.ParentPacket as PacketDotNet.IPv4Packet).SourceAddress.Address,
@@ -144,7 +140,6 @@ namespace GameMessageViewer
         {
             long srcx, dstx;
             int src_index, j;
-            bool first = false;
             ulong newseq;
             tcp_frag tmp_frag;
 
@@ -172,10 +167,15 @@ namespace GameMessageViewer
                 {
                     if (src_port[j] == 0)
                     {
+                        seqinit[j] = false;
+
                         src_addr[j] = srcx;
                         src_port[j] = srcport;
                         src_index = j;
-                        first = true;
+
+                        //eigther syn or syn+ack make for first packets 
+                        //when the tcp stream isnt broken
+
                         break;
                     }
                 }
@@ -185,25 +185,22 @@ namespace GameMessageViewer
                 throw new Exception("ERROR in reassemble_tcp: Too many addresses!");
             }
 
-            if (data_length < length)
-            {
-                incomplete_tcp_stream = true;
-            }
-
             /* now that we have filed away the srcs, lets get the sequence number stuff
              figured out */
-            if (first)
+            if (!seqinit[src_index])
             {
+                seqinit[src_index] = true;
                 /* this is the first time we have seen this src's sequence number */
-                seq[src_index] = sequence + length;
+                seq[src_index] = sequence;
                 if (synflag)
-                {
-                    seq[src_index]++;
-                }
-                /* write out the packet data */
+                    seq[src_index] += 1;
+                seq[src_index] += length;
+
+                /* write out the packet data if any */
                 write_packet_data(src_index, data);
                 return;
             }
+            
             /* if we are here, we have already seen this src, let's
             try and figure out if this packet is in the right place */
             if (sequence < seq[src_index])
@@ -246,7 +243,7 @@ namespace GameMessageViewer
             {
                 /* right on time */
                 seq[src_index] += length;
-                if (synflag) seq[src_index]++;
+                //if (synflag) seq[src_index]++;
                 if (data != null)
                 {
                     write_packet_data(src_index, data);

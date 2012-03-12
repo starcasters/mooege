@@ -203,6 +203,8 @@ namespace GameMessageViewer
             output.Rtf = temp.Rtf;
             foreach (TreeNode tn in actors.Nodes)
             {
+                if (tn.Tag == null)
+                    continue;
                 int pos = temp.Find(tn.Tag as string);
 
                 if (pos > -1)
@@ -347,6 +349,11 @@ namespace GameMessageViewer
         {
             if(tabControl2.SelectedIndex != 0)
                 tabControl2.TabPages.Remove((TabPage)tabControl2.SelectedTab);
+        }
+
+        private void expandAllItemsToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            tree.ExpandAll();
         }
 
     }
