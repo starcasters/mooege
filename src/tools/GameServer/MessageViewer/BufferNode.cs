@@ -105,6 +105,14 @@ namespace GameMessageViewer
 
         static Dictionary<Type, int> gg = new Dictionary<Type, int>();
 
+        private void actormap_addnode(uint actorid, MessageNode node)
+        {
+            if (!actorMap.ContainsKey(actorid))
+                actorMap[actorid] = new TreeNode();
+            actorMap[actorid].Nodes.Add(node.Clone());
+        }
+        
+
         public bool Parse()
         {
             //allNodes.Clear();
@@ -131,7 +139,15 @@ namespace GameMessageViewer
                                 String hex = (message as ACDEnterKnownMessage).ActorID.ToString("X8");
                                 //string name;
                                 //SNOAliases.Aliases.TryGetValue((message as ACDEnterKnownMessage).ActorSNOId.ToString(), out name);
-                                string name = SNOAliases.GetAlias((message as ACDEnterKnownMessage).ActorSNOId);
+                                string name;
+                                try
+                                {
+                                    name = SNOAliases.GetAlias((message as ACDEnterKnownMessage).ActorSNOId);
+                                }
+                                catch(Exception e)
+                                {
+                                    return false;
+                                }
                                 if (!actors.ContainsKey(hex))
                                 {
                                     TreeNode actorNode = new TreeNode(hex + "  " + name);
@@ -170,8 +186,8 @@ namespace GameMessageViewer
                                 )
                                 continue;
 
-                            try
-                            {
+                            //try
+                            //{
                                 if (gg.ContainsKey(message.GetType()))
                                     gg[message.GetType()]++;
                                 else
@@ -179,9 +195,6 @@ namespace GameMessageViewer
 
                                 if (message is ANNDataMessage)
                                 {
-                                    if (actorMap.ContainsKey((uint)(message as ANNDataMessage).ActorID))
-                                        actorMap[(uint)(message as ANNDataMessage).ActorID].Nodes.Add(node.Clone());
-                                    continue;
                                 }
                                 if (message is ACDTranslateFacingMessage)
                                 {
@@ -192,35 +205,42 @@ namespace GameMessageViewer
                                 if (message is AttributeSetValueMessage)
                                 {
                                     var msg = message as AttributeSetValueMessage;
-                                    actorMap[(uint)(message as AttributeSetValueMessage).ActorID].Nodes.Add(node.Clone());
+                                    var actorid = (uint)(message as AttributeSetValueMessage).ActorID;
 
-                                    if (msg.Field1.Attribute != GameAttribute.Attached_To_ACD &&
-                                        msg.Field1.Attribute != GameAttribute.Attachment_ACD &&
-                                        msg.Field1.Attribute != GameAttribute.Banner_ACDID &&
-                                        msg.Field1.Attribute != GameAttribute.Follow_Target_ACDID &&
-                                        msg.Field1.Attribute != GameAttribute.Forced_Enemy_ACDID &&
-                                        msg.Field1.Attribute != GameAttribute.Gizmo_Operator_ACDID &&
-                                        msg.Field1.Attribute != GameAttribute.Guard_Object_ACDID &&
-                                        msg.Field1.Attribute != GameAttribute.Item_Bound_To_ACD &&
-                                        msg.Field1.Attribute != GameAttribute.Last_Damage_ACD &&
-                                        msg.Field1.Attribute != GameAttribute.Last_ACD_Attacked &&
-                                        msg.Field1.Attribute != GameAttribute.Last_ACD_Attacked_By &&
-                                        msg.Field1.Attribute != GameAttribute.Attached_To_ACD &&
-                                        msg.Field1.Attribute != GameAttribute.Last_Blocked_ACD &&
-                                        msg.Field1.Attribute != GameAttribute.Loading_Player_ACD &&
-                                        msg.Field1.Attribute != GameAttribute.RootTargetACD &&
-                                        msg.Field1.Attribute != GameAttribute.Script_Target_ACDID &&
-                                        msg.Field1.Attribute != GameAttribute.Spawned_by_ACDID &&
-                                        msg.Field1.Attribute != GameAttribute.Summoned_By_ACDID &&
-                                        msg.Field1.Attribute != GameAttribute.Taunt_Target_ACD &&
-                                        msg.Field1.Attribute != GameAttribute.Wizard_Slowtime_Proxy_ACD)
-                                        //actorMap[(uint)(message as AttributeSetValueMessage).Field1.Int].Nodes.Add(node.Clone());
-                                        continue;
+                                    if (actorMap.ContainsKey(actorid))
+                                    {
+                                        actorMap[actorid].Nodes.Add(node.Clone());
+
+                                        if (msg.Field1.Attribute != GameAttribute.Attached_To_ACD &&
+                                            msg.Field1.Attribute != GameAttribute.Attachment_ACD &&
+                                            msg.Field1.Attribute != GameAttribute.Banner_ACDID &&
+                                            msg.Field1.Attribute != GameAttribute.Follow_Target_ACDID &&
+                                            msg.Field1.Attribute != GameAttribute.Forced_Enemy_ACDID &&
+                                            msg.Field1.Attribute != GameAttribute.Gizmo_Operator_ACDID &&
+                                            msg.Field1.Attribute != GameAttribute.Guard_Object_ACDID &&
+                                            msg.Field1.Attribute != GameAttribute.Item_Bound_To_ACD &&
+                                            msg.Field1.Attribute != GameAttribute.Last_Damage_ACD &&
+                                            msg.Field1.Attribute != GameAttribute.Last_ACD_Attacked &&
+                                            msg.Field1.Attribute != GameAttribute.Last_ACD_Attacked_By &&
+                                            msg.Field1.Attribute != GameAttribute.Attached_To_ACD &&
+                                            msg.Field1.Attribute != GameAttribute.Last_Blocked_ACD &&
+                                            msg.Field1.Attribute != GameAttribute.Loading_Player_ACD &&
+                                            msg.Field1.Attribute != GameAttribute.RootTargetACD &&
+                                            msg.Field1.Attribute != GameAttribute.Script_Target_ACDID &&
+                                            msg.Field1.Attribute != GameAttribute.Spawned_by_ACDID &&
+                                            msg.Field1.Attribute != GameAttribute.Summoned_By_ACDID &&
+                                            msg.Field1.Attribute != GameAttribute.Taunt_Target_ACD &&
+                                            msg.Field1.Attribute != GameAttribute.Wizard_Slowtime_Proxy_ACD)
+                                        {
+                                            //actorMap[(uint)(message as AttributeSetValueMessage).Field1.Int].Nodes.Add(node.Clone());
+                                        }
+                                    }
+                                    continue;
                                 }
 
                                 if (message is ACDTranslateNormalMessage)
                                 {
-                                    actorMap[(uint)(message as ACDTranslateNormalMessage).ActorId].Nodes.Add(node.Clone());
+                                    actormap_addnode((uint)(message as ACDTranslateNormalMessage).ActorId, node);
                                     continue;
                                 }
                                 if (message is ACDClientTranslateMessage)
@@ -247,17 +267,17 @@ namespace GameMessageViewer
 
                                 if (message is ACDGroupMessage)
                                 {
-                                    actorMap[(uint)(message as ACDGroupMessage).ActorID].Nodes.Add(node.Clone());
+                                    actormap_addnode((uint)(message as ACDGroupMessage).ActorID, node);
                                     continue;
                                 }
                                 if (message is ACDCollFlagsMessage)
                                 {
-                                    actorMap[(uint)(message as ACDCollFlagsMessage).ActorID].Nodes.Add(node.Clone());
+                                    actormap_addnode((uint)(message as ACDCollFlagsMessage).ActorID, node);
                                     continue;
                                 }
                                 if (message is AffixMessage)
                                 {
-                                    actorMap[(uint)(message as AffixMessage).ActorID].Nodes.Add(node.Clone());
+                                    actormap_addnode((uint)(message as AffixMessage).ActorID, node);
                                     continue;
                                 }
                                 if (message is TrickleMessage)
@@ -345,8 +365,9 @@ namespace GameMessageViewer
                                     continue;
                                 }
 
-                            }
-                            catch (Exception) {}
+                            //}
+                            //catch (Exception) {
+                            //}
 
                             #endregion
 

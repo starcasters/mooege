@@ -31,6 +31,8 @@ using Mooege.Net.MooNet.Packets;
 using Mooege.Core.MooNet.Services;
 using Mooege.Net.MooNet;
 using Mooege.Net.MooNet.RPC;
+using Mooege.Net.GS.Message;
+using Mooege.Net.GS.Message.Definitions.Game;
 
 namespace GameMessageViewer
 {
@@ -84,16 +86,39 @@ namespace GameMessageViewer
         /// Returns the protocol version for a given stream if the information is available
         /// Only GS streams have that version set (i guess/hope)
         /// </summary>
-        public string GetVersion(string stream)
+        public bool IsGSStream(string stream)
         {
-            string[] versions = new string[] { "0.5.1.8101", "0.4.0.7865", "0.3.1.7779", "0.3.0.7484", "0.3.0.7333" };
+            if (stream == "")
+                return false;
 
+            var x = stream.Substring(0, stream.IndexOf("\n"));
+            
+            if ((x.Substring(0,1) != "O") && (x.Substring(0,1) != "I"))
+                return false; //is this a mooege dump?
 
-            foreach (string version in versions)
-                if(stream.Contains(Encode(version)))
-                    return version;
+            var currentBuffer = (x.Substring(13)).Replace("\r", "");
+            var buf = String_To_Bytes(currentBuffer);
 
-            return "unknown";
+            GameBitBuffer bitbuffer = new GameBitBuffer(buf);
+            
+            if (bitbuffer.IsPacketAvailable())
+            {
+                try
+                {
+                    bitbuffer.Position = 32;
+                    GameMessage message = bitbuffer.ParseMessage();
+                    if (message is JoinBNetGameMessage)
+                    {
+                        //this isnt real confirmation :P
+                        return true;
+                    }
+                }
+                catch (Exception e)
+                {
+
+                }
+            }
+            return false;
         }
 
 
@@ -158,6 +183,7 @@ namespace GameMessageViewer
                     // if (IsMooNetStream(text)) LoadMooNetDump(text);
                     if (IsAchievmentStream(text)) System.Console.WriteLine("Achievementstream not parsed");
 
+                    //add unknow streams to check em
                     if (!IsMooNetStream(text) && !IsAchievmentStream(text))
                         gsStreams.Add(text);
                 }
@@ -166,7 +192,7 @@ namespace GameMessageViewer
                 // if only one stream is found, or more are found but only one is tagged with mooege protocol version load that one
                 if (gsStreams.Count > 0)
                 {
-                    var correct = gsStreams.Where(x => GetVersion(x).Equals(Mooege.Common.Versions.VersionInfo.Ingame.VersionString));
+                    var correct = gsStreams.Where(x => IsGSStream(x).Equals(true));
 
                     if (correct.Count() == 1)
                         LoadDump(correct.First());
@@ -178,7 +204,8 @@ namespace GameMessageViewer
                         {
                             if (DialogResult.Yes == MessageBox.Show(string.Format("The dump contains more than one unidentified stream, but in none of them mooege version {0} was found. The dump is either broken or of a version Mooege does not support. Continue loading all streams? (This may take longer and messages may appear broken)", Mooege.Common.Versions.VersionInfo.Ingame.VersionString), "Multiple streams found", MessageBoxButtons.YesNo, MessageBoxIcon.Question))
                                 foreach (var stream in gsStreams)
-                                    LoadDump(stream);
+                                    if (IsGSStream(stream))
+                                        LoadDump(stream);
                         }
                     }
                 }
@@ -359,7 +386,7 @@ namespace GameMessageViewer
             if(removeChars < 0)
                 removeChars = rows[0].IndexOf("Out:");
             string clientHash = "";
-            int counter = 0;
+            int lastpacket = 0;
             int size = 0;
             Dictionary<string, BufferNode> lastNodesMissingData = new Dictionary<string, BufferNode>();
             for (int i = 0; i < rows.Length; i++)
@@ -384,54 +411,57 @@ namespace GameMessageViewer
                         // Everytime the direction of data changes, the buffer is parsed and emptied
                         // this is for pcap dumps where the data stream is sent in smaller packets
                         // in mooege, data is dumped in whole
-                        if (i > 0 && rows[i].Substring(0, 1) != currentDirection)
-                        {
-                            byte[] buf = new byte[size / 2];
-                            size = 0;
-                            for(int k = i - counter; k < i; k++)
+                        if (i > 0)
+                            if (rows[i].Substring(0, 1) != currentDirection)
                             {
-                                Array.Copy(String_To_Bytes(rows[k]), 0, buf, size / 2, rows[k].Length / 2); 
-                                size += rows[k].Length;
-                            }
+                                byte[] buf = new byte[size / 2];
+                                size = 0;
+                                for (int k = lastpacket; k < i; k++)
+                                {
+                                    Array.Copy(String_To_Bytes(rows[k]), 0, buf, size / 2, rows[k].Length / 2);
+                                    size += rows[k].Length;
+                                }
 
-                            if (lastNodesMissingData[clientHash + currentDirection] == null)
-                            {
-                                BufferNode newNode = new BufferNode(actors, quests, clientHash);
+                                if (lastNodesMissingData[clientHash + currentDirection] == null)
+                                {
+                                    BufferNode newNode = new BufferNode(actors, quests, clientHash);
 
-                                if (newNode.Append(buf))
-                                    lastNodesMissingData[clientHash + currentDirection] = newNode;
+                                    if (newNode.Append(buf))
+                                        lastNodesMissingData[clientHash + currentDirection] = newNode;
+                                    else
+                                        lastNodesMissingData[clientHash + currentDirection] = null;
+
+                                    newNode.BackColor = currentDirection == "I" ? colors[clientHash][0] : colors[clientHash][1];
+                                    allNodes.Add(newNode);
+                                }
                                 else
-                                    lastNodesMissingData[clientHash + currentDirection] = null;
-
-                                newNode.BackColor = currentDirection == "I" ? colors[clientHash][0] : colors[clientHash][1];
-                                allNodes.Add(newNode);
+                                {
+                                    if (false == lastNodesMissingData[clientHash + currentDirection].Append(buf))
+                                        lastNodesMissingData[clientHash + currentDirection] = null;
+                                }
+                                lastpacket = i;
+                                size = 0;
+                                currentDirection = rows[i].Substring(0, 1);
                             }
-                            else
-                            {
-                                if (false == lastNodesMissingData[clientHash + currentDirection].Append(buf))
-                                    lastNodesMissingData[clientHash + currentDirection] = null;
-                            }
-
-
-                            counter = 0;
-                            size = 0;
-                            currentDirection = rows[i].Substring(0, 1);
-                        }
 
                         if (currentDirection == "") currentDirection = rows[i].Substring(0, 1);
                         rows[i] = rows[i].Substring(13).Replace("\r", "");
-                        counter++;
                         size += rows[i].Length;
+                    }
+                    else
+                    {
+                        //clean invalid lines.
+                        rows[i] = "";
                     }
                 }
             }
 
 
-            if (counter > 0)
+            if (lastpacket < rows.Length)
             {
                 byte[] buf = new byte[size / 2];
                 size = 0;
-                for (int k = rows.Length - counter; k < rows.Length; k++)
+                for (int k = lastpacket; k < rows.Length; k++)
                 {
                     Array.Copy(String_To_Bytes(rows[k]), 0, buf, size / 2, rows[k].Length / 2);
                     size += rows[k].Length;
